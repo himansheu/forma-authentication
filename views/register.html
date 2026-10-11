@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anybody:wdth,wght@50..150,100..900&family=Instrument+Sans:wght@400..700&display=swap">
+<link rel="stylesheet" href="/css/forma.css">
+<title>Open an account – FORMA</title>
+</head>
+<body class="page">
+<a class="skip" href="#form">Skip to the form</a>
+
+<aside class="rail">
+  <a class="rail__word" href="/" aria-label="FORMA home">forma</a>
+</aside>
+
+<main class="stage">
+  <header class="intro">
+    <h1>Open an account</h1>
+    <p>Finish the sentence. Each valid answer stamps a shape into your mark, and that mark becomes yours.</p>
+  </header>
+
+  <div class="mark-wrap">
+    <svg id="mark" class="mark" focusable="false"></svg>
+  </div>
+
+  <form id="form" class="sentence" action="/api/register" method="post" novalidate>
+    <div class="clause">
+      <div class="clause__row">
+        <label class="clause__lead" for="username">I go by<span class="sr-only"> (your username)</span></label>
+        <input id="username" name="username" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="24" required aria-describedby="username-note" placeholder="ishika_k">
+      </div>
+      <p class="clause__note" id="username-note" data-hint="3 to 24 letters, numbers or underscores.">3 to 24 letters, numbers or underscores.</p>
+    </div>
+
+    <div class="clause clause--long">
+      <div class="clause__row">
+        <label class="clause__lead" for="email">Reach me at<span class="sr-only"> (your email address)</span></label>
+        <input id="email" name="email" type="email" autocomplete="email" autocapitalize="none" spellcheck="false" maxlength="254" required aria-describedby="email-note" placeholder="you@example.com">
+      </div>
+      <p class="clause__note" id="email-note" data-hint="Used to sign in. Never shown to anyone else.">Used to sign in. Never shown to anyone else.</p>
+    </div>
+
+    <div class="clause">
+      <div class="clause__row">
+        <label class="clause__lead" for="password">I'll lock it with<span class="sr-only"> (a password)</span></label>
+        <input id="password" name="password" type="password" autocomplete="new-password" required aria-describedby="password-rules password-note">
+        <button class="reveal" type="button" aria-controls="password confirm" aria-label="Show password">Show</button>
+      </div>
+      <ul class="rules" id="password-rules">
+        <li data-rule="length" data-met="false"><span class="sr-only">Still needed: </span>8 characters or more</li>
+        <li data-rule="number" data-met="false"><span class="sr-only">Still needed: </span>at least one number</li>
+      </ul>
+      <p class="clause__note" id="password-note" data-hint=""></p>
+    </div>
+
+    <div class="clause">
+      <div class="clause__row">
+        <label class="clause__lead" for="confirm">and once more<span class="sr-only"> (repeat the password)</span></label>
+        <input id="confirm" name="confirm" type="password" autocomplete="new-password" required aria-describedby="confirm-note">
+      </div>
+      <p class="clause__note" id="confirm-note" data-hint=""></p>
+    </div>
+
+    <p class="alert" role="alert" hidden></p>
+
+    <div class="actions">
+      <button class="btn" type="submit" data-busy="Opening…"><span class="btn__label">Open account</span></button>
+      <p class="aside">Already have one? <a href="/login">Sign in</a></p>
+    </div>
+  </form>
+
+  <section id="done" class="done" tabindex="-1" hidden>
+    <h2>You're in, <span data-name></span>.</h2>
+    <p>Your mark is complete. Taking you to your page. <a href="/dashboard">Go now</a></p>
+  </section>
+
+  <noscript><p class="alert">FORMA needs JavaScript to send the form. Turn it on and reload.</p></noscript>
+</main>
+
+<script type="module" src="/js/register.js"></script>
+</body>
+</html>

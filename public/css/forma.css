@@ -1,0 +1,757 @@
+/* ==========================================================================
+   FORMA
+   One idea: a form is a sentence you finish, and finishing it builds a shape.
+
+   Colour
+     paper  - cool grey-green ground; not cream, not white
+     ink    - bottle green, used for type, the rail and every rule
+     sun / cobalt / coral - the three shape colours. They appear inside the
+       mark and nowhere else, except cobalt which is also the focus colour.
+     error  - a darker red than coral so small text passes contrast
+
+   Type
+     Anybody (variable width) for display: the wordmark runs extra-wide.
+     Instrument Sans for notes, lists and buttons' neighbours.
+   ========================================================================== */
+
+:root {
+  --paper: #e9ecea;
+  --ink: #10302c;
+  --ink-soft: #3d5755;
+  --hint: #566d6a;
+  --line: rgba(16, 48, 44, 0.28);
+
+  --sun: #f2b600;
+  --cobalt: #2540d9;
+  --coral: #e8472b;
+  --error: #b3261e;
+
+  --display: 'Anybody', 'Arial Black', 'Helvetica Neue', system-ui, sans-serif;
+  --body: 'Instrument Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --rail: clamp(84px, 17vh, 200px);
+  --s-sentence: clamp(1.55rem, 1rem + 2.3vw, 2.8rem);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+h1,
+h2,
+p,
+dl,
+dd,
+ul {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 2px;
+}
+
+:focus-visible {
+  outline: 3px solid var(--cobalt);
+  outline-offset: 3px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip {
+  position: absolute;
+  left: 1rem;
+  top: -4rem;
+  z-index: 10;
+  padding: 0.6rem 1rem;
+  background: var(--ink);
+  color: var(--paper);
+  font-weight: 600;
+}
+.skip:focus {
+  top: 1rem;
+}
+
+/* ---------- Page frame: a rail and a stage ---------- */
+
+.page {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: var(--rail) minmax(0, 1fr);
+}
+
+.rail {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.rail__word {
+  position: absolute;
+  left: 0;
+  bottom: 3vh;
+  /* Rotated so the word reads upward. Cropping at the rail's edge is intended. */
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  transform-origin: center;
+  font-family: var(--display);
+  font-weight: 900;
+  font-stretch: 150%;
+  font-size: calc(var(--rail) * 1.2);
+  line-height: 0.78;
+  letter-spacing: -0.03em;
+  text-decoration: none;
+  white-space: nowrap;
+  color: var(--paper);
+  padding-block: 0.02em;
+}
+.rail__word:focus-visible {
+  outline-color: var(--sun);
+  outline-offset: -6px;
+}
+
+.stage {
+  padding: clamp(28px, 7vh, 88px) clamp(20px, 5vw, 80px) clamp(48px, 10vh, 120px) clamp(24px, 6vw, 96px);
+  max-width: 1180px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(150px, 19vw, 260px);
+  grid-template-areas:
+    'intro intro'
+    'form  mark';
+  column-gap: clamp(24px, 6vw, 96px);
+  row-gap: clamp(28px, 6vh, 64px);
+  align-content: start;
+}
+
+.intro {
+  grid-area: intro;
+  max-width: 38rem;
+}
+
+.intro h1 {
+  font-family: var(--display);
+  font-weight: 800;
+  font-stretch: 130%;
+  font-size: clamp(2.1rem, 4.2vw, 3.6rem);
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+.intro p {
+  margin-top: 0.9rem;
+  max-width: 32rem;
+  color: var(--ink-soft);
+  font-size: 1.05rem;
+}
+
+/* ---------- The mark ---------- */
+
+.mark-wrap {
+  grid-area: mark;
+  position: sticky;
+  top: clamp(24px, 6vh, 64px);
+  align-self: start;
+}
+
+.mark {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.mark__slot {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.5;
+  stroke-dasharray: 3 5;
+  vector-effect: non-scaling-stroke;
+  transition: opacity 0.3s;
+}
+.mark__cell.is-placed .mark__slot {
+  stroke-dasharray: none;
+  opacity: 0.22;
+}
+
+.mark__shape {
+  transform: scale(0.35);
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 0.45s cubic-bezier(0.3, 1.5, 0.5, 1), opacity 0.2s;
+}
+.mark__cell.is-placed .mark__shape {
+  transform: none;
+  opacity: 1;
+}
+
+.fill-sun {
+  fill: var(--sun);
+}
+.fill-cobalt {
+  fill: var(--cobalt);
+}
+.fill-coral {
+  fill: var(--coral);
+}
+
+/* Waiting on the server: the four slots take turns. */
+@keyframes slot-pulse {
+  0%,
+  100% {
+    stroke: var(--ink);
+    stroke-width: 1.5;
+  }
+  35% {
+    stroke: var(--cobalt);
+    stroke-width: 5;
+    stroke-dasharray: none;
+  }
+}
+.mark.is-busy .mark__slot {
+  animation: slot-pulse 1.2s infinite;
+}
+.mark.is-busy .mark__cell:nth-child(2) .mark__slot {
+  animation-delay: 0.15s;
+}
+.mark.is-busy .mark__cell:nth-child(3) .mark__slot {
+  animation-delay: 0.3s;
+}
+.mark.is-busy .mark__cell:nth-child(4) .mark__slot {
+  animation-delay: 0.45s;
+}
+
+.mark.is-error .mark__slot {
+  stroke: var(--error);
+  stroke-width: 3;
+  stroke-dasharray: none;
+  opacity: 1;
+}
+
+/* ---------- The sentence form ---------- */
+
+.sentence {
+  grid-area: form;
+  max-width: 44rem;
+  font-size: var(--s-sentence);
+}
+
+.clause {
+  margin-bottom: 1.5rem;
+}
+
+.clause__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 0.45em;
+  row-gap: 0.1em;
+}
+
+.clause__lead {
+  flex: none;
+  font-family: var(--display);
+  font-weight: 400;
+  font-stretch: 100%;
+  font-size: 1em;
+  line-height: 1.15;
+  color: var(--ink-soft);
+}
+
+.sentence input {
+  flex: 1 1 6em;
+  min-width: 0;
+  padding: 0.05em 0 0.02em;
+  border: 0;
+  border-bottom: 3px solid var(--ink);
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink);
+  caret-color: var(--cobalt);
+  font-family: var(--display);
+  font-weight: 700;
+  font-stretch: 100%;
+  font-size: 1em;
+  line-height: 1.15;
+  outline: none;
+}
+.clause--long input {
+  flex-basis: 14em;
+}
+.sentence input::placeholder {
+  color: var(--hint);
+  font-weight: 400;
+}
+.sentence input:focus {
+  border-bottom-color: var(--cobalt);
+  box-shadow: 0 3px 0 0 var(--cobalt);
+}
+.sentence input:focus-visible {
+  outline: 3px solid var(--cobalt);
+  outline-offset: 6px;
+}
+
+.clause.has-error input {
+  border-bottom-color: var(--error);
+  box-shadow: 0 3px 0 0 var(--error);
+}
+
+.clause__note {
+  margin-top: 0.4rem;
+  min-height: 1.5em;
+  font-family: var(--body);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+.clause__note:empty {
+  min-height: 0;
+  margin-top: 0;
+}
+.has-error .clause__note {
+  color: var(--error);
+  font-weight: 600;
+}
+
+.reveal {
+  flex: none;
+  align-self: center;
+  min-height: 44px;
+  padding: 0 0.4rem;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+.rules {
+  list-style: none;
+  padding: 0;
+  margin-top: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 1.4rem;
+  font-family: var(--body);
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+}
+.rules li::before {
+  content: '○' / '';
+  display: inline-block;
+  width: 1.3em;
+}
+.rules li[data-met='true'] {
+  color: var(--ink);
+  font-weight: 600;
+}
+.rules li[data-met='true']::before {
+  content: '●' / '';
+}
+
+/* ---------- Buttons and messages ---------- */
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.6rem;
+  margin-top: 2rem;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8em;
+  min-height: 52px;
+  padding: 0.7em 1.3em;
+  border: 0;
+  border-radius: 0;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--display);
+  font-weight: 700;
+  font-stretch: 120%;
+  font-size: 1.2rem;
+  line-height: 1.1;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+.btn::after {
+  content: '';
+  width: 0.8em;
+  height: 0.8em;
+  background: var(--sun);
+  border-top-left-radius: 100%;
+  transition: transform 0.3s;
+}
+.btn:hover:not(:disabled) {
+  background: var(--cobalt);
+}
+.btn:hover:not(:disabled)::after,
+.btn:focus-visible::after {
+  transform: rotate(90deg);
+}
+.btn:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.btn--quiet {
+  background: transparent;
+  color: var(--ink);
+  box-shadow: inset 0 0 0 2px var(--ink);
+}
+.btn--quiet::after {
+  display: none;
+}
+.btn--quiet:hover:not(:disabled) {
+  background: var(--ink);
+  color: var(--paper);
+}
+.btn--small {
+  min-height: 44px;
+  padding: 0.4em 0.9em;
+  font-size: 1rem;
+}
+
+.aside {
+  font-family: var(--body);
+  font-size: 1rem;
+  color: var(--ink-soft);
+}
+.aside a {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.alert,
+.success {
+  margin-top: 1.2rem;
+  padding: 0.8rem 1rem;
+  font-family: var(--body);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--ink);
+}
+.alert {
+  border-left: 8px solid var(--error);
+  background: rgba(179, 38, 30, 0.09);
+}
+.success {
+  border-left: 8px solid var(--cobalt);
+  background: rgba(37, 64, 217, 0.08);
+}
+
+/* ---------- Finished state ---------- */
+
+.done {
+  grid-area: form;
+  align-self: start;
+  max-width: 44rem;
+}
+.done:focus {
+  outline: none;
+}
+.done h2 {
+  font-family: var(--display);
+  font-weight: 800;
+  font-stretch: 120%;
+  font-size: clamp(1.9rem, 4vw, 3.2rem);
+  line-height: 1.05;
+  overflow-wrap: anywhere;
+}
+.done p {
+  margin-top: 1rem;
+  font-size: 1.1rem;
+  color: var(--ink-soft);
+}
+.done a {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* ---------- Dashboard ---------- */
+
+.stage--dash {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: none;
+  row-gap: 0;
+  max-width: 1120px;
+}
+.stage--plain {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: none;
+}
+.stage--plain .intro {
+  grid-area: auto;
+}
+
+.dash-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(104px, 14vw, 190px);
+  grid-template-areas:
+    'out  out'
+    'text mark';
+  column-gap: clamp(20px, 4vw, 64px);
+  row-gap: clamp(24px, 6vh, 56px);
+  align-items: end;
+  padding-bottom: clamp(28px, 6vh, 64px);
+}
+.dash-out {
+  grid-area: out;
+  justify-self: end;
+}
+.dash-head__text {
+  grid-area: text;
+  min-width: 0;
+}
+.dash-head .mark {
+  grid-area: mark;
+}
+
+.dash-name {
+  font-family: var(--display);
+  font-weight: 800;
+  font-stretch: 120%;
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
+  font-size: clamp(2.4rem, 6.2vw, 5rem);
+}
+.dash-name[data-size='l'] {
+  font-size: clamp(3rem, 9vw, 7.5rem);
+}
+.dash-name[data-size='s'] {
+  font-size: clamp(1.8rem, 4.2vw, 3.4rem);
+}
+.dash-sub {
+  margin-top: 0.9rem;
+  color: var(--ink-soft);
+  font-size: 1.05rem;
+}
+
+.ledger {
+  display: grid;
+  grid-template-columns: minmax(150px, 1fr) 3fr;
+  column-gap: clamp(20px, 4vw, 64px);
+  padding-block: clamp(24px, 5vh, 44px);
+  border-top: 3px solid var(--ink);
+}
+.ledger > h2 {
+  font-family: var(--display);
+  font-weight: 700;
+  font-stretch: 120%;
+  font-size: 1.15rem;
+  line-height: 1.2;
+}
+
+.facts > div {
+  display: grid;
+  grid-template-columns: minmax(7rem, 10rem) minmax(0, 1fr);
+  align-items: baseline;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.facts > div:first-child {
+  padding-top: 0;
+}
+.facts dt {
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+}
+.facts dd {
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: clamp(1.1rem, 2vw, 1.55rem);
+  overflow-wrap: anywhere;
+}
+
+.sessions {
+  list-style: none;
+  padding: 0;
+}
+.session {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.6rem 1.2rem;
+  padding: 0.9rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.session:first-child {
+  padding-top: 0;
+}
+.session__device {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 1.25rem;
+  line-height: 1.2;
+}
+.session__meta {
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+}
+.tag {
+  display: inline-block;
+  margin-left: 0.3rem;
+  padding: 0.05rem 0.45rem;
+  border: 2px solid var(--ink);
+  font-family: var(--body);
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.3;
+  vertical-align: middle;
+}
+#revoke-others {
+  margin-top: 1.2rem;
+}
+#sessions-note:empty {
+  display: none;
+}
+
+.ledger .sentence,
+.ledger .done {
+  grid-area: auto;
+}
+
+.sentence--small {
+  --s-sentence: clamp(1.15rem, 0.9rem + 1vw, 1.6rem);
+  font-size: var(--s-sentence);
+  max-width: 40rem;
+}
+.sentence--small .actions {
+  margin-top: 1.4rem;
+}
+.sentence--small .btn {
+  font-size: 1.05rem;
+}
+
+/* ---------- Narrow screens: the rail lies down and becomes a band ---------- */
+
+@media (max-width: 820px) {
+  .page {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+  }
+  .rail {
+    position: static;
+    height: clamp(72px, 21vw, 150px);
+  }
+  .rail__word {
+    left: 5vw;
+    bottom: auto;
+    top: 0;
+    writing-mode: horizontal-tb;
+    transform: none;
+    font-size: clamp(5rem, 23vw, 11rem);
+    line-height: 0.9;
+    padding: 0;
+    margin-top: -0.04em;
+  }
+
+  .stage {
+    padding: 28px 20px 56px;
+    grid-template-columns: minmax(0, 1fr) clamp(88px, 24vw, 130px);
+    grid-template-areas:
+      'intro mark'
+      'form  form';
+    column-gap: 20px;
+    row-gap: 28px;
+  }
+  .intro {
+    max-width: none;
+  }
+  .intro p {
+    font-size: 1rem;
+  }
+  .mark-wrap {
+    position: static;
+    align-self: start;
+  }
+  .sentence {
+    --s-sentence: clamp(1.4rem, 5.6vw, 2rem);
+  }
+
+  .stage--dash,
+  .stage--plain {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: none;
+  }
+  .dash-head {
+    grid-template-columns: minmax(0, 1fr) clamp(88px, 24vw, 130px);
+  }
+  .ledger {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .facts > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.1rem;
+  }
+  .session {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .session .btn {
+    justify-self: start;
+  }
+  .btn {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .btn--small,
+  .dash-out {
+    width: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

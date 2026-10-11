@@ -1,0 +1,24 @@
+{
+  "name": "forma",
+  "version": "1.0.0",
+  "description": "FORMA - an authentication product with its own visual identity.",
+  "main": "src/server.js",
+  "private": true,
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test test/",
+    "secret": "node scripts/generate-secret.js"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "better-sqlite3": "^12.2.0",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "express-session": "^1.18.1",
+    "helmet": "^8.0.0"
+  },
+  "license": "MIT"
+}

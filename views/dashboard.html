@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anybody:wdth,wght@50..150,100..900&family=Instrument+Sans:wght@400..700&display=swap">
+<link rel="stylesheet" href="/css/forma.css">
+<title>Your page – FORMA</title>
+</head>
+<body class="page page--dash">
+<a class="skip" href="#main">Skip to your account</a>
+
+<aside class="rail">
+  <a class="rail__word" href="/dashboard" aria-label="FORMA home">forma</a>
+</aside>
+
+<main class="stage stage--dash" id="main" aria-busy="true">
+  <header class="dash-head">
+    <div class="dash-head__text">
+      <h1 class="dash-name" id="name"><span class="sr-only">Loading your account</span></h1>
+      <p class="dash-sub" id="sub">Loading…</p>
+    </div>
+    <svg id="mark" class="mark" focusable="false"></svg>
+    <button class="btn btn--quiet dash-out" id="logout" type="button" data-busy="Signing out…"><span class="btn__label">Sign out</span></button>
+  </header>
+
+  <p class="alert" id="page-alert" role="alert" hidden></p>
+
+  <section class="ledger" aria-labelledby="h-account">
+    <h2 id="h-account">Account</h2>
+    <dl class="facts">
+      <div><dt>Username</dt><dd id="f-username"></dd></div>
+      <div><dt>Email</dt><dd id="f-email"></dd></div>
+      <div><dt>Member since</dt><dd id="f-joined"></dd></div>
+    </dl>
+  </section>
+
+  <section class="ledger" aria-labelledby="h-sessions">
+    <h2 id="h-sessions">Where you're signed in</h2>
+    <div>
+      <ul class="sessions" id="sessions" aria-live="polite"></ul>
+      <p class="clause__note" id="sessions-note" role="status"></p>
+      <button class="btn btn--quiet" id="revoke-others" type="button" hidden>Sign out everywhere else</button>
+    </div>
+  </section>
+
+  <section class="ledger" aria-labelledby="h-password">
+    <h2 id="h-password">Password</h2>
+    <form id="pw-form" class="sentence sentence--small" novalidate>
+      <div class="clause">
+        <div class="clause__row">
+          <label class="clause__lead" for="current">Replace<span class="sr-only"> (your current password)</span></label>
+          <input id="current" name="current" type="password" autocomplete="current-password" required aria-describedby="current-note" placeholder="current password">
+          <button class="reveal" type="button" aria-controls="current next confirm" aria-label="Show password">Show</button>
+        </div>
+        <p class="clause__note" id="current-note" data-hint=""></p>
+      </div>
+      <div class="clause">
+        <div class="clause__row">
+          <label class="clause__lead" for="next">with<span class="sr-only"> (a new password)</span></label>
+          <input id="next" name="next" type="password" autocomplete="new-password" required aria-describedby="next-note" placeholder="new password">
+        </div>
+        <p class="clause__note" id="next-note" data-hint="8 characters or more, with at least one number.">8 characters or more, with at least one number.</p>
+      </div>
+      <div class="clause">
+        <div class="clause__row">
+          <label class="clause__lead" for="confirm">and again<span class="sr-only"> (repeat the new password)</span></label>
+          <input id="confirm" name="confirm" type="password" autocomplete="new-password" required aria-describedby="confirm-note">
+        </div>
+        <p class="clause__note" id="confirm-note" data-hint=""></p>
+      </div>
+      <p class="alert" role="alert" hidden></p>
+      <p class="success" id="pw-success" role="status" hidden></p>
+      <div class="actions">
+        <button class="btn" type="submit" data-busy="Saving…"><span class="btn__label">Change password</span></button>
+        <p class="aside">Changing it signs you out on every other device.</p>
+      </div>
+    </form>
+  </section>
+</main>
+
+<script type="module" src="/js/dashboard.js"></script>
+</body>
+</html>
